@@ -132,7 +132,7 @@ static PetscErrorCode MonitorFlowAndParticleError(TS ts, PetscInt step, PetscRea
     CHKERRABORT(PETSC_COMM_WORLD, ierr);
 
 
-     ierr = VecViewFromOptions(u, NULL, "-vec_view");
+     ierr = VecViewFromOptions(u, NULL, "-sol_view");
      CHKERRABORT(PETSC_COMM_WORLD, ierr);
 
     //  ierr = VecView(u, NULL);CHKERRABORT(PETSC_COMM_WORLD, ierr);
@@ -152,17 +152,15 @@ static PetscErrorCode MonitorFlowAndParticleError(TS ts, PetscInt step, PetscRea
      */
 
     if (step == 0) {
-        ierr = ParticleViewFromOptions(particlesData, NULL, "-particle_init");
+        ierr = ParticleViewFromOptions(particlesData, "-particle_init");
         CHKERRABORT(PETSC_COMM_WORLD, ierr);
     } else {
-        ierr = ParticleViewFromOptions(particlesData, NULL, "-particle_view");
+        ierr = ParticleViewFromOptions(particlesData, "-particle_view");
         CHKERRABORT(PETSC_COMM_WORLD, ierr);
     }
 
     PetscFunctionReturn(0);
 }
-
-
 
 
 
@@ -358,7 +356,7 @@ int main( int argc, char *argv[] )
     CHKERRABORT(PETSC_COMM_WORLD, ierr);
 
 
-    ierr = ParticleTracerSetupIntegrator(particles, particleTs, ts);
+    ierr = ParticleTracerSetupIntegrator(particles, particleTs, flowData);
     CHKERRABORT(PETSC_COMM_WORLD, ierr);
 
 
@@ -468,7 +466,11 @@ int main( int argc, char *argv[] )
      * -Npb 1 -particle_lower 0.05,0.1 -particle_upper 0.3,0.9 -particle_layout_type box -vec_init hdf5:/Users/pedram/scratch/sol.h5 -vec_view hdf5:/Users/pedram/scratch/sol.h5::append -dm_view hdf5:/Users/pedram/scratch/sol.h5 -dm_refine 2 -vel_petscspace_degree 2 -pres_petscspace_degree 1 -temp_petscspace_degree 1 -ksp_type fgmres -ksp_rtol 1.0e-9 -ksp_atol 1.0e-12 -ksp_error_if_not_converged -pc_type fieldsplit -pc_fieldsplit_0_fields 0,2 -pc_fieldsplit_1_fields 1 -pc_fieldsplit_type schur -pc_fieldsplit_schur_factorization_type full -fieldsplit_0_pc_type lu -fieldsplit_pressure_ksp_rtol 1e-10 -fieldsplit_pressure_pc_type jacobi -dm_plex_separate_marker -snes_monitor -ksp_monitor -snes_converged_reason -ksp_converged_reason -particle_view hdf5:/Users/pedram/scratch/solP.h5::append -particle_init hdf5:/Users/pedram/scratch/solP.h5
      */
 
-
+    /*
+     *
+     * Updated by Mcgurn - update paths to particle output
+     * -Npb 1 -particle_lower 0.05,0.1 -particle_upper 0.3,0.9 -particle_layout_type box  -sol_view hdf5:sol.h5::append -dm_view hdf5:sol.h5 -dm_refine 2 -vel_petscspace_degree 2 -pres_petscspace_degree 1 -temp_petscspace_degree 1 -ksp_type fgmres -ksp_rtol 1.0e-9 -ksp_atol 1.0e-12 -ksp_error_if_not_converged -pc_type fieldsplit -pc_fieldsplit_0_fields 0,2 -pc_fieldsplit_1_fields 1 -pc_fieldsplit_type schur -pc_fieldsplit_schur_factorization_type full -fieldsplit_0_pc_type lu -fieldsplit_pressure_ksp_rtol 1e-10 -fieldsplit_pressure_pc_type jacobi -dm_plex_separate_marker -snes_monitor -ksp_monitor -snes_converged_reason -ksp_converged_reason -particle_view hdf5:solP.h5::append -particle_init hdf5:solP.h5
+     */
 
 
 
