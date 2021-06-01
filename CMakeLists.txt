@@ -39,3 +39,24 @@ target_link_libraries(ablateLibraryClient PUBLIC ablateLibrary)
 # define the two sample programs
 add_executable(ablateCoreClient ablateCoreClient.c)
 target_link_libraries(ablateCoreClient PUBLIC ablateCore)
+
+# define cavity example
+add_executable(cavity_case cavity.c)
+target_link_libraries(cavity_case PUBLIC ablateCore)
+
+# define a vector test case
+add_executable(test_vec test_vec.c)
+target_link_libraries(test_vec PUBLIC ablateCore)
+
+# define ex4 given by Dr. Knepley
+add_executable(ex4_case ex4.c)
+target_link_libraries(ex4_case PUBLIC ablateCore)
+
+# define quiescent fluid case
+add_executable(quiescentFluid_case quiescentFluid.c)
+target_link_libraries(quiescentFluid_case PUBLIC ablateCore)
+
+# define some examples by Matt McGurn
+add_executable(pointerCase pointerExp.c)
+add_executable(structCase structExp.c)
+#target_link_libraries(mattTest_case PUBLIC ablateCore)
