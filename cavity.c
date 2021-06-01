@@ -7,7 +7,11 @@ static char help[] = "Simple Petsc program";
 #include <petsc.h>
 #include "incompressibleFlow.h"
 #include "mesh.h"
+<<<<<<< HEAD
 #include "particleInertial.h"
+=======
+#include "particleTracer.h"
+>>>>>>> 6aeac66eb315393126f29798d5a89d366543a9dc
 #include "particles.h"
 #include "particleInitializer.h"
 #include "petscviewer.h"
@@ -132,7 +136,11 @@ static PetscErrorCode MonitorFlowAndParticleError(TS ts, PetscInt step, PetscRea
     CHKERRABORT(PETSC_COMM_WORLD, ierr);
 
 
+<<<<<<< HEAD
      ierr = VecViewFromOptions(u, NULL, "-vec_view");
+=======
+     ierr = VecViewFromOptions(u, NULL, "-sol_view");
+>>>>>>> 6aeac66eb315393126f29798d5a89d366543a9dc
      CHKERRABORT(PETSC_COMM_WORLD, ierr);
 
     //  ierr = VecView(u, NULL);CHKERRABORT(PETSC_COMM_WORLD, ierr);
@@ -152,10 +160,17 @@ static PetscErrorCode MonitorFlowAndParticleError(TS ts, PetscInt step, PetscRea
      */
 
     if (step == 0) {
+<<<<<<< HEAD
         ierr = ParticleViewFromOptions(particlesData, NULL, "-particle_init");
         CHKERRABORT(PETSC_COMM_WORLD, ierr);
     } else {
         ierr = ParticleViewFromOptions(particlesData, NULL, "-particle_view");
+=======
+        ierr = ParticleViewFromOptions(particlesData, "-particle_init");
+        CHKERRABORT(PETSC_COMM_WORLD, ierr);
+    } else {
+        ierr = ParticleViewFromOptions(particlesData, "-particle_view");
+>>>>>>> 6aeac66eb315393126f29798d5a89d366543a9dc
         CHKERRABORT(PETSC_COMM_WORLD, ierr);
     }
 
@@ -163,6 +178,7 @@ static PetscErrorCode MonitorFlowAndParticleError(TS ts, PetscInt step, PetscRea
 }
 
 
+<<<<<<< HEAD
 static PetscErrorCode ParticleSetInitialVelocity(DM particleDm) {
 
     PetscFunctionBeginUser;
@@ -205,6 +221,8 @@ static PetscErrorCode ParticleSetInitialVelocity(DM particleDm) {
 
 
 
+=======
+>>>>>>> 6aeac66eb315393126f29798d5a89d366543a9dc
 
 int main( int argc, char *argv[] )
 {
@@ -221,7 +239,11 @@ int main( int argc, char *argv[] )
     PetscReal t;
     PetscInt Dim=2;
     PetscReal dt=0.1;       // dt for time stepper
+<<<<<<< HEAD
     PetscInt max_steps=2; // maximum time steps
+=======
+    PetscInt max_steps=10; // maximum time steps
+>>>>>>> 6aeac66eb315393126f29798d5a89d366543a9dc
 
     PetscReal Re=1.0;       // Reynolds number
     PetscReal St=1.0;       // Strouhal number
@@ -259,8 +281,16 @@ int main( int argc, char *argv[] )
     ierr = IncompressibleFlow_SetupDiscretization(flowData, dm);
     CHKERRABORT(PETSC_COMM_WORLD, ierr);
 
+<<<<<<< HEAD
     IncompressibleFlowParameters flowParameters;
 
+=======
+
+
+    IncompressibleFlowParameters flowParameters;
+
+
+>>>>>>> 6aeac66eb315393126f29798d5a89d366543a9dc
     // changing non-dimensional parameters manually here ...
     flowParameters.strouhal = St;
     flowParameters.reynolds = Re;
@@ -364,12 +394,20 @@ int main( int argc, char *argv[] )
     ParticleData particles;
 
     // Setup the particle domain
+<<<<<<< HEAD
     ierr = ParticleInertialCreate(&particles, Dim);
     //ierr = ParticleInertialCreate(&particles, Dim);
     CHKERRABORT(PETSC_COMM_WORLD, ierr);
 
     // link the flow to the particles
     ierr = ParticleInitializeFlow(particles, flowData);
+=======
+    ierr = ParticleTracerCreate(&particles, Dim);
+    CHKERRABORT(PETSC_COMM_WORLD, ierr);
+
+    // link the flow to the particles
+    ParticleInitializeFlow(particles, flowData);
+>>>>>>> 6aeac66eb315393126f29798d5a89d366543a9dc
     CHKERRABORT(PETSC_COMM_WORLD, ierr);
 
     // name the particle domain
@@ -378,9 +416,14 @@ int main( int argc, char *argv[] )
     ierr = PetscObjectSetName((PetscObject)particles->dm, "Particles");
     CHKERRABORT(PETSC_COMM_WORLD, ierr);
 
+<<<<<<< HEAD
     // initialize the particles position and velocity
     ierr = ParticleInitialize(dm, particles->dm);CHKERRABORT(PETSC_COMM_WORLD, ierr);
     ierr = ParticleSetInitialVelocity(particles->dm);CHKERRABORT(PETSC_COMM_WORLD, ierr);
+=======
+    // initialize the particles
+    ParticleInitialize(dm, particles->dm);
+>>>>>>> 6aeac66eb315393126f29798d5a89d366543a9dc
 
     // setup the flow monitor to also check particles
     ierr = TSMonitorSet(ts, MonitorFlowAndParticleError, particles, NULL);
@@ -396,14 +439,62 @@ int main( int argc, char *argv[] )
     ierr = PetscObjectSetOptionsPrefix((PetscObject)particleTs, "particle_");
     CHKERRABORT(PETSC_COMM_WORLD, ierr);
 
+<<<<<<< HEAD
     ierr = ParticleInertialSetupIntegrator(particles, particleTs, flowData);
     CHKERRABORT(PETSC_COMM_WORLD, ierr);
 
+=======
+
+    ierr = ParticleTracerSetupIntegrator(particles, particleTs, flowData);
+    CHKERRABORT(PETSC_COMM_WORLD, ierr);
+
+
+    // setup the initial conditions for error computing
+    /*
+    ierr = TSSetComputeExactError(particleTs, computeParticleError);
+    CHKERRABORT(PETSC_COMM_WORLD, ierr);
+    ierr = TSSetComputeInitialCondition(particleTs, setParticleExactSolution);
+    CHKERRABORT(PETSC_COMM_WORLD, ierr);
+    */
+
+    // copy over the initial location
+    /*
+    PetscReal *coord;
+    PetscReal *initialLocation;
+    PetscInt numberParticles;
+    ierr = DMSwarmGetLocalSize(particles->dm, &numberParticles);
+    CHKERRABORT(PETSC_COMM_WORLD, ierr);
+    ierr = DMSwarmGetField(particles->dm, DMSwarmPICField_coor, NULL, NULL, (void **)&coord);
+    CHKERRABORT(PETSC_COMM_WORLD, ierr);
+    ierr = DMSwarmGetField(particles->dm, "InitialLocation", NULL, NULL, (void **)&initialLocation);
+    CHKERRABORT(PETSC_COMM_WORLD, ierr);
+    for (int i = 0; i < numberParticles * 2; ++i) {
+        initialLocation[i] = coord[i];
+    }
+    ierr = DMSwarmRestoreField(particles->dm, DMSwarmPICField_coor, NULL, NULL, (void **)&coord);
+    CHKERRABORT(PETSC_COMM_WORLD, ierr);
+    ierr = DMSwarmRestoreField(particles->dm, "InitialLocation", NULL, NULL, (void **)&initialLocation);
+    CHKERRABORT(PETSC_COMM_WORLD, ierr);
+    */
+>>>>>>> 6aeac66eb315393126f29798d5a89d366543a9dc
 
     // Solve the one way coupled system
     ierr = TSSolve(ts, flowData->flowField);
     CHKERRABORT(PETSC_COMM_WORLD, ierr);
 
+<<<<<<< HEAD
+=======
+    // Compare the actual vs expected values
+    /*
+    ierr = DMTSCheckFromOptions(ts, flowData->flowField);
+    CHKERRABORT(PETSC_COMM_WORLD, ierr);
+    */
+
+    //PetscBool hdf5;
+    // ierr = ParticleView(particles, );CHKERRQ(ierr);
+
+    // PETSCVIEWERHDF5
+>>>>>>> 6aeac66eb315393126f29798d5a89d366543a9dc
 
     // Cleanup
     ierr = DMDestroy(&dm);
@@ -414,7 +505,11 @@ int main( int argc, char *argv[] )
     CHKERRABORT(PETSC_COMM_WORLD, ierr);
     ierr = FlowDestroy(&flowData);
     CHKERRABORT(PETSC_COMM_WORLD, ierr);
+<<<<<<< HEAD
     ierr = ParticleInertialDestroy(&particles);
+=======
+    ierr = ParticleTracerDestroy(&particles);
+>>>>>>> 6aeac66eb315393126f29798d5a89d366543a9dc
     CHKERRABORT(PETSC_COMM_WORLD, ierr);
     ierr = PetscFinalize();
     exit(ierr);
@@ -468,7 +563,15 @@ int main( int argc, char *argv[] )
      * -Npb 1 -particle_lower 0.05,0.1 -particle_upper 0.3,0.9 -particle_layout_type box -vec_init hdf5:/Users/pedram/scratch/sol.h5 -vec_view hdf5:/Users/pedram/scratch/sol.h5::append -dm_view hdf5:/Users/pedram/scratch/sol.h5 -dm_refine 2 -vel_petscspace_degree 2 -pres_petscspace_degree 1 -temp_petscspace_degree 1 -ksp_type fgmres -ksp_rtol 1.0e-9 -ksp_atol 1.0e-12 -ksp_error_if_not_converged -pc_type fieldsplit -pc_fieldsplit_0_fields 0,2 -pc_fieldsplit_1_fields 1 -pc_fieldsplit_type schur -pc_fieldsplit_schur_factorization_type full -fieldsplit_0_pc_type lu -fieldsplit_pressure_ksp_rtol 1e-10 -fieldsplit_pressure_pc_type jacobi -dm_plex_separate_marker -snes_monitor -ksp_monitor -snes_converged_reason -ksp_converged_reason -particle_view hdf5:/Users/pedram/scratch/solP.h5::append -particle_init hdf5:/Users/pedram/scratch/solP.h5
      */
 
+<<<<<<< HEAD
 
+=======
+    /*
+     *
+     * Updated by Mcgurn - update paths to particle output
+     * -Npb 1 -particle_lower 0.05,0.1 -particle_upper 0.3,0.9 -particle_layout_type box  -sol_view hdf5:sol.h5::append -dm_view hdf5:sol.h5 -dm_refine 2 -vel_petscspace_degree 2 -pres_petscspace_degree 1 -temp_petscspace_degree 1 -ksp_type fgmres -ksp_rtol 1.0e-9 -ksp_atol 1.0e-12 -ksp_error_if_not_converged -pc_type fieldsplit -pc_fieldsplit_0_fields 0,2 -pc_fieldsplit_1_fields 1 -pc_fieldsplit_type schur -pc_fieldsplit_schur_factorization_type full -fieldsplit_0_pc_type lu -fieldsplit_pressure_ksp_rtol 1e-10 -fieldsplit_pressure_pc_type jacobi -dm_plex_separate_marker -snes_monitor -ksp_monitor -snes_converged_reason -ksp_converged_reason -particle_view hdf5:solP.h5::append -particle_init hdf5:solP.h5
+     */
+>>>>>>> 6aeac66eb315393126f29798d5a89d366543a9dc
 
 
 
